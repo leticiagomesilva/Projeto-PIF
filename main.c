@@ -12,6 +12,10 @@
 #include "timer.h"
 
 int score = 0;
+int margemX = 3;
+int margemY = 1;
+
+// Colors: BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA, LIGHTCYAN, WHITE
 
 typedef struct objeto{
   char nome[50];
@@ -23,19 +27,20 @@ typedef struct objeto{
   double incY;
 }objeto;
 
-double x = 20, y = MAXY-1;
 
-void printObjeto(double nextX, double nextY, char *objeto){
-  screenSetColor(CYAN, DARKGRAY);
-  screenGotoxy(x, y);
-  
-  for (int i = 0; i < strlen(objeto); i++) printf(" ");
-  
-  x = nextX;
-  y = nextY;
-  
-  screenGotoxy(x, y);
+void printObject(double nextX, double nextY, char *objeto, int color){
+  screenSetColor(color, DARKGRAY);
+  screenGotoxy(nextX, nextY);
   printf("%s", objeto);
+}
+
+void deleteObjects(){
+  for (int i = 9; i < MAXY; i++){
+    screenGotoxy(MINX+1, i);
+    for (int j = 0; j < 77; j++){
+      printf(" ");
+    }
+  }
 }
 
 void printScore(int ch){
@@ -59,19 +64,25 @@ int main(){
   chick.y = MAXY-1;
   chick.incY = 1.5;
 
+  // Cerca
+  objeto cerca;
+  cerca.x = 60;
+  cerca.y = MAXY-1;
+  cerca.incX = -0.8;
+
 
   screenInit(1);
   keyboardInit();
   timerInit(50);
 
-  printObjeto(x, y, "Chick");
+  //printObject(x, y, "Chick");
   
   screenUpdate();
   
   while (ch != 10) //enter
   {
     // Handle user input
-    if (keyhit() && y >= MAXY-1){
+    if (keyhit() && chick.y >= MAXY-1){
         ch = readch();
         printScore(score);
         screenUpdate();
@@ -79,16 +90,41 @@ int main(){
 
     // Update game state (move elements, verify collision, etc)
     if (timerTimeOver() == 1){
+      // Limpar tela
+      deleteObjects();
+      
+      // Movimento dos objetos
       chick.y = chick.y + chick.incY;
+      cerca.x = cerca.x + cerca.incX;
 
       // Pulo do Chick
-      if (ch == 32 || chick.y <= 10) chick.incY = -chick.incY, ch = 0, score++;
+      if (ch == 32 || chick.y <= 10) chick.incY = -chick.incY, ch = 0;
 
       // Chão
       if (chick.y >= MAXY-1) chick.y = MAXY-1;
+      if (cerca.y >= MAXY-1) cerca.y = MAXY-1;
 
+      // Loop de obstaculos
+      if (cerca.x <= MINX+1) cerca.x = MAXX-6, score++, cerca.incX -= 0.1;
+
+      // Colisões
+      if (abs(chick.x - cerca.x) <= margemX && abs(chick.y - cerca.y) <= margemY){
+        cerca.incX = 0;
+        printObject(35, 12, "GAME OVER", 1);
+      }
+
+      // Recomeçar
+      if (cerca.incX == 0 && ch == 114){
+        cerca.incX = -0.8;
+        cerca.x = 60;
+        deleteObjects();
+        score = 0;
+        ch = 0;
+      }
+      // Prints
       printScore(score);
-      printObjeto(chick.x, chick.y, "Chick");
+      printObject(chick.x, chick.y, "Chick", 6);
+      printObject(cerca.x, cerca.y, "Cerca", 5);
 
       screenUpdate();
     }
