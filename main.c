@@ -12,11 +12,6 @@
 #include "keyboard.h"
 #include "timer.h"
 
-int score = 0;
-int margemX = 5;
-int margemY = 0;
-double gravidade = 0.22;
-
 // Colors: BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA, LIGHTCYAN, WHITE
 
 typedef struct objeto{
@@ -45,7 +40,7 @@ void deleteObjects(){
   }
 }
 
-void printScore(int ch){
+void printScore(int points){
   screenSetColor(YELLOW, DARKGRAY);
   screenGotoxy(35, 4);
   printf("SCORE:");
@@ -54,11 +49,15 @@ void printScore(int ch){
   printf("         ");
 
   screenGotoxy(43, 4);
-  printf("%d ", score);
+  printf("%d ", points);
 }
 
 int main(){
   static int ch = 0;
+  int score = 0;
+  int margemX = 5;
+  int margemY = 0;
+  double gravidade = 0.22;
   int colisao = 0;
 
   // Chick
@@ -129,9 +128,8 @@ int main(){
         chick.incY = 0;
         gravidade = 0;
 
-        if (abs((int)chick.y - (int)cerca2.y) <= margemY){
-          chick.y = cerca2.y-1;
-        }
+        if (abs((int)chick.y - (int)cerca2.y) <= margemY) chick.y = cerca2.y-1;
+        else if (abs((int)chick.x - (int)cerca1.x) <= margemX) chick.x = cerca1.x-5;
       }
 
       // GAME OVER
@@ -163,6 +161,7 @@ int main(){
       printObject(cerca1.x, cerca1.y, "|--|--|", 5);
       printObject(cerca2.x, cerca2.y, "|--|--|", 5);
 
+      // Atualização da tela
       screenUpdate();
     }
   }
