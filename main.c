@@ -54,11 +54,8 @@ void printScore(int points){
 
 int main(){
   static int ch = 0;
-  int score = 0;
-  int margemX = 5;
-  int margemY = 0;
+  int score = 0, margemX = 5, margemY = 0, colisao = 0;
   double gravidade = 0.22;
-  int colisao = 0;
 
   // Chick
   objeto chick;
@@ -67,34 +64,34 @@ int main(){
   chick.incY = 0;
 
   // Cerca
-  objeto cerca1;
+  objeto cerca1; // Parte de baixo
   cerca1.x = 60;
   cerca1.y = MAXY-1;
   cerca1.incX = -1.0;
 
-  objeto cerca2;
+  objeto cerca2; // Parte de cima
   cerca2.x = 60;
   cerca2.y = MAXY-2;
   cerca2.incX = -1.0;
 
-
+  // Estado inicial do jogo
   screenInit(1);
   keyboardInit();
   timerInit(50);
-  
   screenUpdate();
   
-  while (ch != 10) //enter
+  while (ch != 10) // Enter
   {
-    // Handle user input
+    // Input do usuário
     if (keyhit() && chick.y >= MAXY-3){
         ch = readch();
         printScore(score);
         screenUpdate();
     }
 
-    // Update game state (move elements, verify collision, etc)
+    // Atualizar o estado do jogo
     if (timerTimeOver() == 1){
+      
       // Limpar tela
       deleteObjects();
       
@@ -147,8 +144,9 @@ int main(){
         
         cerca1.x = 60;
         cerca2.x = 60;
+
+        chick.y = MAXY-1;
         
-        deleteObjects();
         score = 0;
         ch = 0;
       }
