@@ -6,14 +6,16 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "screen.h"
 #include "keyboard.h"
 #include "timer.h"
 
 int score = 0;
-int margemX = 3;
-int margemY = 0.5;
+int margemX = 5;
+int margemY = 0;
+double gravidade = 0.22;
 
 // Colors: BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA, LIGHTCYAN, WHITE
 
@@ -57,12 +59,13 @@ void printScore(int ch){
 
 int main(){
   static int ch = 0;
+  int colisao = 0;
 
   // Chick
   objeto chick;
   chick.x = 20.0;
   chick.y = MAXY-1;
-  chick.incY = 1.5;
+  chick.incY = 0;
 
   // Cerca
   objeto cerca1;
@@ -101,8 +104,11 @@ int main(){
       cerca1.x = cerca1.x + cerca1.incX;
       cerca2.x = cerca2.x + cerca2.incX;
 
+      // Gravidade
+      chick.incY = chick.incY + gravidade;
+
       // Pulo do Chick
-      if (ch == 32 || chick.y <= 10) chick.incY = -chick.incY, ch = 0;
+      if (ch == 32 && chick.y >= MAXY-1) chick.incY = -2.0, ch = 0;
 
       // Chão
       if (chick.y >= MAXY-1) chick.y = MAXY-1;
@@ -114,18 +120,32 @@ int main(){
       if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX -= 0.1;
 
       // Colisões
-      if ((abs(chick.x - cerca1.x) <= margemX && abs(chick.y - cerca1.y) <= margemY) || (abs(chick.x - cerca2.x) <= margemX && abs(chick.y - cerca2.y) <= margemY)){
+      if ((abs((int)chick.x - (int)cerca1.x) <= margemX && abs((int)chick.y - (int)cerca1.y) <= margemY) || (abs((int)chick.x - (int)cerca2.x) <= margemX && abs((int)chick.y - (int)cerca2.y) <= margemY)){
+        colisao = 1;
+        
         cerca1.incX = 0;
         cerca2.incX = 0;
+        
         chick.incY = 0;
-        printObject(35, 12, "GAME OVER", 1);
+        gravidade = 0;
+
+        if (abs((int)chick.y - (int)cerca2.y) <= margemY){
+          chick.y = cerca2.y-1;
+        }
       }
+
+      // GAME OVER
+      if (colisao == 1) printObject(35, 12, "GAME OVER", 1);
 
       // Recomeçar
       if (cerca1.incX == 0 && ch == 114){
+        colisao = 0;
+        
         cerca1.incX = -1.0;
         cerca2.incX = -1.0;
-        chick.incY = 1.5;
+        
+        chick.incY = 0;
+        gravidade = 0.2;
         
         cerca1.x = 60;
         cerca2.x = 60;
@@ -134,6 +154,7 @@ int main(){
         score = 0;
         ch = 0;
       }
+      
       // Prints
       printScore(score);
       
@@ -146,9 +167,9 @@ int main(){
     }
   }
 
-    keyboardDestroy();
-    screenDestroy();
-    timerDestroy();
+  keyboardDestroy();
+  screenDestroy();
+  timerDestroy();
 
-    return 0;
+  return 0;
 }
