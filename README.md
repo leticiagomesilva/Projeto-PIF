@@ -5,5 +5,5 @@ A Fazer:
 - Adicionar desenho do chick
 - Adicionar o obstáculo da casinha
 - Criar um high score da partida com lista encadeada
-- Ramdomizar a velocidade dos obstáculos
+- Randomizar a velocidade dos obstáculos
 - Desenhar um fundo/paisagem  para o jogo (montanhas)
