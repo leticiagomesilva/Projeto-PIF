@@ -24,6 +24,37 @@ typedef struct objeto{
   double incY;
 }objeto;
 
+typedef struct node{
+  int valor;
+  struct node *next;
+}lista;
+
+void addNodeDesc(lista **head, int var){
+  lista *n = *head;
+  lista *novo = (lista *)malloc(sizeof(lista));
+
+  novo->valor = var;
+  novo->next = NULL;
+
+  if (*head == NULL) {
+    *head = novo;
+  } else if (n->valor < var) { 
+    novo->next = *head;
+    *head = novo;
+  } else {
+    while (n->next != NULL && n->next->valor > var) { 
+      n = n->next;
+    }
+    if (n->next == NULL) {
+      novo->next = NULL;
+      n->next = novo;
+    } else {
+      novo->next = n->next;
+      n->next = novo;
+    }
+  }
+}
+
 
 void printObject(double nextX, double nextY, char *objeto, int color){
   screenSetColor(color, DARKGRAY);
@@ -44,7 +75,7 @@ void printScore(int points){
   screenSetColor(YELLOW, DARKGRAY);
   screenGotoxy(35, 4);
   printf("SCORE:");
-  
+
   screenGotoxy(43, 4);
   printf("         ");
 
@@ -52,10 +83,28 @@ void printScore(int points){
   printf("%d ", points);
 }
 
+void printHighScore(lista *head){
+
+  screenSetColor(YELLOW, DARKGRAY);
+  screenGotoxy(30, 6);
+  printf("HIGH SCORE:");
+
+  screenGotoxy(43, 6);
+  printf("                    ");
+
+  screenGotoxy(43, 6); 
+  if (head != NULL){
+    printf("%d ", head -> valor);
+  }else{
+    printf("0");
+  }
+}
+
 int main(){
   static int ch = 0;
   int score = 0, margemX = 5, margemY = 0, colisao = 0;
   double gravidade = 0.22;
+  lista *head = NULL;
 
   // Chick
   objeto chick;
@@ -79,7 +128,7 @@ int main(){
   keyboardInit();
   timerInit(50);
   screenUpdate();
-  
+
   while (ch != 10) // Enter
   {
     // Input do usuário
@@ -91,10 +140,10 @@ int main(){
 
     // Atualizar o estado do jogo
     if (timerTimeOver() == 1){
-      
+
       // Limpar tela
       deleteObjects();
-      
+
       // Movimento dos objetos
       chick.y = chick.y + chick.incY;
       cerca1.x = cerca1.x + cerca1.incX;
@@ -112,16 +161,16 @@ int main(){
       if (cerca2.y >= MAXY-2) cerca2.y = MAXY-2;
 
       // Loop de obstaculos
-      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, cerca1.incX -= 0.1;
+      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, addNodeDesc(&head, score), cerca1.incX -= 0.1;
       if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX -= 0.1;
 
       // Colisões
       if ((abs((int)chick.x - (int)cerca1.x) <= margemX && abs((int)chick.y - (int)cerca1.y) <= margemY) || (abs((int)chick.x - (int)cerca2.x) <= margemX && abs((int)chick.y - (int)cerca2.y) <= margemY)){
         colisao = 1;
-        
+
         cerca1.incX = 0;
         cerca2.incX = 0;
-        
+
         chick.incY = 0;
         gravidade = 0;
 
@@ -130,32 +179,37 @@ int main(){
       }
 
       // GAME OVER
-      if (colisao == 1) printObject(35, 12, "GAME OVER", 1);
+      if (colisao == 1){
+        printObject(35, 12, "GAME OVER", 1); 
+        //addNodeDesc(&head, score);
+      } 
+        
 
       // Recomeçar
       if (cerca1.incX == 0 && ch == 114){
         colisao = 0;
-        
+
         cerca1.incX = -1.0;
         cerca2.incX = -1.0;
-        
+
         chick.incY = 0;
         gravidade = 0.2;
-        
+
         cerca1.x = 60;
         cerca2.x = 60;
 
         chick.y = MAXY-1;
-        
+
         score = 0;
         ch = 0;
       }
-      
+
       // Prints
       printScore(score);
-      
+      printHighScore(head);
+
       printObject(chick.x, chick.y, "Chick", 6);
-      
+
       printObject(cerca1.x, cerca1.y, "|--|--|", 5);
       printObject(cerca2.x, cerca2.y, "|--|--|", 5);
 
