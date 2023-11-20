@@ -30,6 +30,7 @@ typedef struct node{
   struct node *next;
 }lista;
 
+
 float randomInc(){
   srand(time(0));
   float random = rand() % 120 + 1;
@@ -39,7 +40,7 @@ float randomInc(){
   if (random >= 10) inc = random / 1000;
   else inc = random / 100;
 
-  if (random <= 50) return inc;
+  if (random <= 60) return inc;
   else return -inc;
 }
 
@@ -77,9 +78,15 @@ void printObject(double nextX, double nextY, char *objeto, int color){
 }
 
 void deleteObjects(){
-  for (int i = 9; i < MAXY; i++){
+  int lim = 0;
+  
+  for (int i = 8; i < MAXY; i++){
     screenGotoxy(MINX+1, i);
-    for (int j = 0; j < 77; j++){
+
+    if (i < MAXY-2) lim = 44;
+    else lim = 77;
+    
+    for (int j = 0; j < lim; j++){
       printf(" ");
     }
   }
@@ -116,15 +123,25 @@ void printHighScore(lista *head){
 
 int main(){
   static int ch = 0;
-  int score = 0, margemX = 5, margemY = 0, colisao = 0;
+  int score = 0, margemX = 7, margemY = 0, colisao = 0;
   double gravidade = 0.22;
   lista *head = NULL;
 
   // Chick
-  objeto chick;
-  chick.x = 20.0;
-  chick.y = MAXY-1;
-  chick.incY = 0;
+  objeto chick_corpo; // Parte de baixo
+  chick_corpo.x = 20.0;
+  chick_corpo.y = MAXY-1;
+  chick_corpo.incY = 0;
+
+  objeto chick_cara; // Parte do meio
+  chick_cara.x = 20.0;
+  chick_cara.y = MAXY-2;
+  chick_cara.incY = 0;
+
+  objeto chick_cabeca; // Parte de cima
+  chick_cabeca.x = 20.0;
+  chick_cabeca.y = MAXY-3;
+  chick_cabeca.incY = 0;
 
   // Cerca
   objeto cerca1; // Parte de baixo
@@ -146,7 +163,7 @@ int main(){
   while (ch != 10) // Enter
   {
     // Input do usuário
-    if (keyhit() && chick.y >= MAXY-3){
+    if (keyhit() && chick_corpo.y >= MAXY-3){
         ch = readch();
         printScore(score);
         screenUpdate();
@@ -159,18 +176,26 @@ int main(){
       deleteObjects();
 
       // Movimento dos objetos
-      chick.y = chick.y + chick.incY;
+      chick_corpo.y = chick_corpo.y + chick_corpo.incY;
+      chick_cara.y = chick_cara.y + chick_cara.incY;
+      chick_cabeca.y = chick_cabeca.y + chick_cabeca.incY;
+      
       cerca1.x = cerca1.x + cerca1.incX;
       cerca2.x = cerca2.x + cerca2.incX;
 
       // Gravidade
-      chick.incY = chick.incY + gravidade;
+      chick_corpo.incY = chick_corpo.incY + gravidade;
+      chick_cara.incY = chick_cara.incY + gravidade;
+      chick_cabeca.incY = chick_cabeca.incY + gravidade;
 
       // Pulo do Chick
-      if (ch == 32 && chick.y >= MAXY-1) chick.incY = -2.0, ch = 0;
+      if (ch == 32 && chick_corpo.y >= MAXY-1) chick_corpo.incY = -2.2, chick_cara.incY = -2.2, chick_cabeca.incY = -2.2, ch = 0;
 
       // Chão
-      if (chick.y >= MAXY-1) chick.y = MAXY-1;
+      if (chick_corpo.y >= MAXY-1) chick_corpo.y = MAXY-1;
+      if (chick_cara.y >= MAXY-2) chick_cara.y = MAXY-2;
+      if (chick_cabeca.y >= MAXY-3) chick_cabeca.y = MAXY-3;
+      
       if (cerca1.y >= MAXY-1) cerca1.y = MAXY-1;
       if (cerca2.y >= MAXY-2) cerca2.y = MAXY-2;
 
@@ -180,25 +205,34 @@ int main(){
       if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX += randinc;
 
       // Colisões
-      if ((abs((int)chick.x - (int)cerca1.x) <= margemX && abs((int)chick.y - (int)cerca1.y) <= margemY) || (abs((int)chick.x - (int)cerca2.x) <= margemX && abs((int)chick.y - (int)cerca2.y) <= margemY)){
+      if ((abs((int)chick_corpo.x - (int)cerca1.x) <= margemX && abs((int)chick_corpo.y - (int)cerca1.y) <= margemY) || (abs((int)chick_corpo.x - (int)cerca2.x) <= margemX && abs((int)chick_corpo.y - (int)cerca2.y) <= margemY)){
         colisao = 1;
 
         cerca1.incX = 0;
         cerca2.incX = 0;
 
-        chick.incY = 0;
+        chick_corpo.incY = 0;
+        chick_cara.incY = 0;
+        chick_cabeca.incY = 0;
         gravidade = 0;
 
-        if (abs((int)chick.y - (int)cerca2.y) <= margemY) chick.y = cerca2.y-1;
-        else if (abs((int)chick.x - (int)cerca1.x) <= margemX) chick.x = cerca1.x-5;
+        if (abs((int)chick_corpo.y - (int)cerca2.y) <= margemY){
+          chick_corpo.y = cerca2.y-1;
+          chick_cara.y = cerca2.y-2;
+          chick_cabeca.y = cerca2.y-3;
+        }
+        else if (abs((int)chick_corpo.x - (int)cerca1.x) <= margemX){
+          chick_corpo.x = cerca1.x-margemX;
+          chick_cara.x = cerca1.x-margemX;
+          chick_cabeca.x = cerca1.x-margemX;
+        }
       }
 
       // GAME OVER
       if (colisao == 1){
         printObject(35, 12, "GAME OVER", 1); 
-        //addNodeDesc(&head, score);
       } 
-        
+
 
       // Recomeçar
       if (cerca1.incX == 0 && ch == 114){
@@ -207,13 +241,18 @@ int main(){
         cerca1.incX = -1.0;
         cerca2.incX = -1.0;
 
-        chick.incY = 0;
-        gravidade = 0.2;
+        chick_corpo.incY = 0;
+        chick_cara.incY = 0;
+        chick_cabeca.incY = 0;
+        
+        gravidade = 0.22;
 
         cerca1.x = 60;
         cerca2.x = 60;
 
-        chick.y = MAXY-1;
+        chick_corpo.y = MAXY-1;
+        chick_cara.y = MAXY-2;
+        chick_cabeca.y = MAXY-3;
 
         score = 0;
         ch = 0;
@@ -223,7 +262,12 @@ int main(){
       printScore(score);
       printHighScore(head);
 
-      printObject(chick.x, chick.y, "Chick", 6);
+      screenGotoxy(54, 4);
+      printf("%lf", cerca1.incX);
+
+      printObject(chick_cabeca.x, chick_cabeca.y, " _/\\_ ", 6);
+      printObject(chick_cara.x, chick_cara.y, "(  o )>", 6);
+      printObject(chick_corpo.x, chick_corpo.y, "(  / )", 6);
 
       printObject(cerca1.x, cerca1.y, "|--|--|", 5);
       printObject(cerca2.x, cerca2.y, "|--|--|", 5);
