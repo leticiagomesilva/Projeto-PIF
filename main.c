@@ -104,7 +104,7 @@ void printScore(int points){
   printf("%d ", points);
 }
 
-void printHighScore(lista *head){
+void printHighScore(lista *head, int score){
 
   screenSetColor(YELLOW, DARKGRAY);
   screenGotoxy(30, 6);
@@ -113,17 +113,24 @@ void printHighScore(lista *head){
   screenGotoxy(43, 6);
   printf("                    ");
 
-  screenGotoxy(43, 6); 
-  if (head != NULL){
-    printf("%d ", head -> valor);
-  }else{
-    printf("0");
+  screenGotoxy(43, 6);
+  if (head == NULL || score > head->valor) printf("%d", score);
+  else printf("%d", head->valor);
+  
+}
+
+void printList(lista *head){
+  struct node *n = head;
+  while(n!= NULL){
+    printf(" %d ",n->valor);
+    n = n -> next;
   }
+  printf("\n");
 }
 
 int main(){
   static int ch = 0;
-  int score = 0, margemX = 7, margemY = 0, colisao = 0;
+  int score = 0, margemX = 7, margemY = 0, colisao = 0, addHighscore = 1;
   double gravidade = 0.22;
   lista *head = NULL;
 
@@ -201,7 +208,7 @@ int main(){
 
       // Loop de obstaculos
       float randinc = randomInc();
-      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, addNodeDesc(&head, score), cerca1.incX += randinc;
+      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, cerca1.incX += randinc;
       if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX += randinc;
 
       // Colisões
@@ -215,6 +222,8 @@ int main(){
         chick_cara.incY = 0;
         chick_cabeca.incY = 0;
         gravidade = 0;
+
+        if (addHighscore == 1) addNodeDesc(&head, score), addHighscore = 0;
 
         if (abs((int)chick_corpo.y - (int)cerca2.y) <= margemY){
           chick_corpo.y = cerca2.y-1;
@@ -230,13 +239,17 @@ int main(){
 
       // GAME OVER
       if (colisao == 1){
-        printObject(35, 12, "GAME OVER", 1); 
+        printObject(35, 12, "GAME OVER", 1);
       } 
 
 
-      // Recomeçar
+      // Recomeçar e HIGH SCORE
       if (cerca1.incX == 0 && ch == 114){
         colisao = 0;
+        ch = 0;
+        score = 0;
+
+        addHighscore = 1;
 
         cerca1.incX = -1.0;
         cerca2.incX = -1.0;
@@ -253,14 +266,11 @@ int main(){
         chick_corpo.y = MAXY-1;
         chick_cara.y = MAXY-2;
         chick_cabeca.y = MAXY-3;
-
-        score = 0;
-        ch = 0;
       }
 
       // Prints
       printScore(score);
-      printHighScore(head);
+      printHighScore(head, score);
 
       screenGotoxy(54, 4);
       printf("%lf", cerca1.incX);
@@ -280,6 +290,9 @@ int main(){
   keyboardDestroy();
   screenDestroy();
   timerDestroy();
+
+  printf("Scores da partida (em ordem decrescente): ");
+  printList(head);
 
   return 0;
 }
