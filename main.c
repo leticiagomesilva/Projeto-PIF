@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "screen.h"
 #include "keyboard.h"
@@ -28,6 +29,19 @@ typedef struct node{
   int valor;
   struct node *next;
 }lista;
+
+float randomInc(){
+  srand(time(0));
+  float random = rand() % 120 + 1;
+
+  float inc;
+
+  if (random >= 10) inc = random / 1000;
+  else inc = random / 100;
+
+  if (random <= 50) return inc;
+  else return -inc;
+}
 
 void addNodeDesc(lista **head, int var){
   lista *n = *head;
@@ -161,8 +175,9 @@ int main(){
       if (cerca2.y >= MAXY-2) cerca2.y = MAXY-2;
 
       // Loop de obstaculos
-      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, addNodeDesc(&head, score), cerca1.incX -= 0.1;
-      if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX -= 0.1;
+      float randinc = randomInc();
+      if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, addNodeDesc(&head, score), cerca1.incX += randinc;
+      if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX += randinc;
 
       // Colisões
       if ((abs((int)chick.x - (int)cerca1.x) <= margemX && abs((int)chick.y - (int)cerca1.y) <= margemY) || (abs((int)chick.x - (int)cerca2.x) <= margemX && abs((int)chick.y - (int)cerca2.y) <= margemY)){
