@@ -12,15 +12,14 @@ void displayMatrix(char matrix[][30], int rows, int cols) {
 
 int main() {
     // Matriz para representar uma galinha simples
-    char chicken[4][30] = {
+    char chicken[3][30] = {
         "     _/\\_            ",
         "    (  o )>            ",
         "   /(  \" )      ",
-        "     _/_/            ",
     };
 
     // Exibe a matriz no console
-    displayMatrix(chicken, 4, 30);
+    displayMatrix(chicken, 3, 30);
 
     return 0;
 }
