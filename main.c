@@ -79,13 +79,13 @@ void printObject(double nextX, double nextY, char *objeto, int color){
 
 void deleteObjects(){
   int lim = 0;
-  
+
   for (int i = 8; i < MAXY; i++){
     screenGotoxy(MINX+1, i);
 
     if (i < MAXY-2) lim = 44;
     else lim = 77;
-    
+
     for (int j = 0; j < lim; j++){
       printf(" ");
     }
@@ -116,7 +116,7 @@ void printHighScore(lista *head, int score){
   screenGotoxy(43, 6);
   if (head == NULL || score > head->valor) printf("%d", score);
   else printf("%d", head->valor);
-  
+
 }
 
 void printList(lista *head){
@@ -186,7 +186,7 @@ int main(){
       chick_corpo.y = chick_corpo.y + chick_corpo.incY;
       chick_cara.y = chick_cara.y + chick_cara.incY;
       chick_cabeca.y = chick_cabeca.y + chick_cabeca.incY;
-      
+
       cerca1.x = cerca1.x + cerca1.incX;
       cerca2.x = cerca2.x + cerca2.incX;
 
@@ -202,7 +202,7 @@ int main(){
       if (chick_corpo.y >= MAXY-1) chick_corpo.y = MAXY-1;
       if (chick_cara.y >= MAXY-2) chick_cara.y = MAXY-2;
       if (chick_cabeca.y >= MAXY-3) chick_cabeca.y = MAXY-3;
-      
+
       if (cerca1.y >= MAXY-1) cerca1.y = MAXY-1;
       if (cerca2.y >= MAXY-2) cerca2.y = MAXY-2;
 
@@ -257,7 +257,7 @@ int main(){
         chick_corpo.incY = 0;
         chick_cara.incY = 0;
         chick_cabeca.incY = 0;
-        
+
         gravidade = 0.22;
 
         cerca1.x = 60;
@@ -272,8 +272,8 @@ int main(){
       printScore(score);
       printHighScore(head, score);
 
-      screenGotoxy(54, 4);
-      printf("%lf", cerca1.incX);
+      //screenGotoxy(54, 4);
+      //printf("%lf", cerca1.incX);
 
       printObject(chick_cabeca.x, chick_cabeca.y, " _/\\_ ", 6);
       printObject(chick_cara.x, chick_cara.y, "(  o )>", 6);
