@@ -9,5 +9,5 @@ A Fazer:
 gcc – o chickrunning main.c keyboard.c screen.c timer.c
 ```
 ```
-./main
+./chickrunning
 ```
