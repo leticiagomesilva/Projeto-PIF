@@ -6,7 +6,7 @@ A Fazer:
 - Desenhar um fundo/paisagem  para o jogo (montanhas)
 
 ```
-gcc – o chickrunning main.c keyboard.c screen.c timer.c
+gcc –o chickrunning main.c keyboard.c screen.c timer.c
 ```
 ```
 ./chickrunning
