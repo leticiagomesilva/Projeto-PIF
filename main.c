@@ -6,22 +6,20 @@
 */
 
 #include <string.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdlib.h> // abs
+#include <time.h> // time
 
 #include "screen.h"
 #include "keyboard.h"
 #include "timer.h"
 
-// Colors: BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA, LIGHTCYAN, WHITE
+// Colors: BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY, DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA, LIGHTCYAN, WHITE
 
 typedef struct objeto{
-  char nome[50];
-
-  double x;
+  double x; // Coordenadas
   double y;
 
-  double incX;
+  double incX; // Aceleração
   double incY;
 }objeto;
 
@@ -31,9 +29,9 @@ typedef struct node{
 }lista;
 
 
-float randomInc(){
-  srand(time(0));
-  float random = rand() % 120 + 1;
+float randomInc(){ //Incremento aleatório
+  srand(time(0)); // Definir seed aleatória utilizando a função time
+  float random = rand() % 120 + 1; // Números aletórios entre 1-120
 
   float inc;
 
@@ -51,25 +49,24 @@ void addNodeDesc(lista **head, int var){
   novo->valor = var;
   novo->next = NULL;
 
-  if (*head == NULL) {
+  if (*head == NULL) {                          
     *head = novo;
   } else if (n->valor < var) { 
     novo->next = *head;
     *head = novo;
   } else {
-    while (n->next != NULL && n->next->valor > var) { 
+    while (n->next != NULL && n->next->valor > var) {
       n = n->next;
     }
     if (n->next == NULL) {
       novo->next = NULL;
       n->next = novo;
     } else {
-      novo->next = n->next;
+      novo->next = n->next;            
       n->next = novo;
     }
   }
 }
-
 
 void printObject(double nextX, double nextY, char *objeto, int color){
   screenSetColor(color, DARKGRAY);
@@ -80,7 +77,7 @@ void printObject(double nextX, double nextY, char *objeto, int color){
 void deleteObjects(){
   int lim = 0;
 
-  for (int i = 8; i < MAXY; i++){
+  for (int i = 8; i < MAXY; i++){ // Começar a apagar a partir da linha 8 (logo abaixo do HIGH SCORE)
     screenGotoxy(MINX+1, i);
 
     if (i < MAXY-2) lim = 44;
@@ -98,10 +95,10 @@ void printScore(int points){
   printf("SCORE:");
 
   screenGotoxy(43, 4);
-  printf("         ");
+  printf("   ");
 
   screenGotoxy(43, 4);
-  printf("%d ", points);
+  printf("%d", points);
 }
 
 void printHighScore(lista *head, int score){
@@ -111,9 +108,10 @@ void printHighScore(lista *head, int score){
   printf("HIGH SCORE:");
 
   screenGotoxy(43, 6);
-  printf("                    ");
+  printf("   ");
 
   screenGotoxy(43, 6);
+  
   if (head == NULL || score > head->valor) printf("%d", score);
   else printf("%d", head->valor);
 
@@ -121,15 +119,15 @@ void printHighScore(lista *head, int score){
 
 void printList(lista *head){
   struct node *n = head;
-  while(n!= NULL){
-    printf(" %d ",n->valor);
+  while(n != NULL){
+    printf(" %d ", n->valor);
     n = n -> next;
   }
   printf("\n");
 }
 
 int main(){
-  static int ch = 0;
+  static int ch = 0; // Input do teclado
   int score = 0, margemX = 7, margemY = 0, colisao = 0, addHighscore = 1;
   double gravidade = 0.22;
   lista *head = NULL;
@@ -172,46 +170,45 @@ int main(){
     // Input do usuário
     if (keyhit() && chick_corpo.y >= MAXY-3){
         ch = readch();
-        printScore(score);
         screenUpdate();
     }
 
     // Atualizar o estado do jogo
-    if (timerTimeOver() == 1){
+    if (timerTimeOver() == 1){  // Se passaram os 50 millisegundos do timer
 
       // Limpar tela
       deleteObjects();
 
       // Movimento dos objetos
-      chick_corpo.y = chick_corpo.y + chick_corpo.incY;
-      chick_cara.y = chick_cara.y + chick_cara.incY;
-      chick_cabeca.y = chick_cabeca.y + chick_cabeca.incY;
+      chick_corpo.y += chick_corpo.incY; // Mover Chick (no eixo y)
+      chick_cara.y += chick_cara.incY;
+      chick_cabeca.y += chick_cabeca.incY;
 
-      cerca1.x = cerca1.x + cerca1.incX;
-      cerca2.x = cerca2.x + cerca2.incX;
+      cerca1.x += cerca1.incX; // Mover cerca (no eixo x)
+      cerca2.x += cerca2.incX;
 
       // Gravidade
-      chick_corpo.incY = chick_corpo.incY + gravidade;
-      chick_cara.incY = chick_cara.incY + gravidade;
-      chick_cabeca.incY = chick_cabeca.incY + gravidade;
+      chick_corpo.incY += gravidade;
+      chick_cara.incY += gravidade;
+      chick_cabeca.incY += gravidade;
 
       // Pulo do Chick
       if (ch == 32 && chick_corpo.y >= MAXY-1) chick_corpo.incY = -2.2, chick_cara.incY = -2.2, chick_cabeca.incY = -2.2, ch = 0;
 
       // Chão
-      if (chick_corpo.y >= MAXY-1) chick_corpo.y = MAXY-1;
-      if (chick_cara.y >= MAXY-2) chick_cara.y = MAXY-2;
-      if (chick_cabeca.y >= MAXY-3) chick_cabeca.y = MAXY-3;
+      if (chick_corpo.y > MAXY-1) chick_corpo.y = MAXY-1;
+      if (chick_cara.y > MAXY-2) chick_cara.y = MAXY-2;
+      if (chick_cabeca.y > MAXY-3) chick_cabeca.y = MAXY-3;
 
-      if (cerca1.y >= MAXY-1) cerca1.y = MAXY-1;
-      if (cerca2.y >= MAXY-2) cerca2.y = MAXY-2;
+      if (cerca1.y > MAXY-1) cerca1.y = MAXY-1;
+      if (cerca2.y > MAXY-2) cerca2.y = MAXY-2;
 
       // Loop de obstaculos
       float randinc = randomInc();
       if (cerca1.x <= MINX+1) cerca1.x = MAXX-8, score++, cerca1.incX += randinc;
       if (cerca2.x <= MINX+1) cerca2.x = MAXX-8, cerca2.incX += randinc;
 
-      // Colisões
+      // Colisões e HIGH SCORE
       if ((abs((int)chick_corpo.x - (int)cerca1.x) <= margemX && abs((int)chick_corpo.y - (int)cerca1.y) <= margemY) || (abs((int)chick_corpo.x - (int)cerca2.x) <= margemX && abs((int)chick_corpo.y - (int)cerca2.y) <= margemY)){
         colisao = 1;
 
@@ -221,6 +218,7 @@ int main(){
         chick_corpo.incY = 0;
         chick_cara.incY = 0;
         chick_cabeca.incY = 0;
+        
         gravidade = 0;
 
         if (addHighscore == 1) addNodeDesc(&head, score), addHighscore = 0;
@@ -243,8 +241,8 @@ int main(){
       } 
 
 
-      // Recomeçar e HIGH SCORE
-      if (cerca1.incX == 0 && ch == 114){
+      // Recomeçar
+      if (colisao == 1 && ch == 114){ // r
         colisao = 0;
         ch = 0;
         score = 0;
