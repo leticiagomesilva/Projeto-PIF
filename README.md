@@ -3,13 +3,11 @@ Projeto da matéria de Programação Imperativa Funcional, do segundo período d
 
 PASSOS PARA JOGAR O CHICK RUNNING
 
-- CÓDIGO DE INICIO
-
-1. O usuário precisa digitar essa linha de código no terminal shell:
+Primeiro é necessário verificar que as bibliotecas e o arquivo main.c que estão presentes no GitHub estão no mesmo arquivo diretório da sua máquina e rodar a seguinte linha de comando:
 ```
 gcc –o chickrunning main.c keyboard.c screen.c timer.c
 ```
-2. Logo em seguida digitar essa segunda linha:
+Logo em seguida, digitar essa segunda linha:
 ```
 ./chickrunning
 ```
