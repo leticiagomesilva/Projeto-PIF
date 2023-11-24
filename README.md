@@ -26,4 +26,4 @@ Logo em seguida, digitar essa segunda linha:
 5. Se o jogador quiser recomeçar e jogar novamente é necessario que ele aperte a tecla "R" e o jogo recomeçará zerando o "SCORE" e salvando este score no HighScore.
 - o HighScore salva e mostra as melhores pontuações em sequência da maior para a menor, para ver elas é necessário digitar a telha "ENTER" ao final da rodada.
 
-6. Para encerrar o chick running é necessário digitar a tecla "ENTER" no "GAME OUVER" e ele irá sair do jogo mostrando o HighScore.
+6. Para encerrar o chick running é necessário digitar a tecla "ENTER" no "GAME OVER" e ele irá sair do jogo mostrando o HighScore.
